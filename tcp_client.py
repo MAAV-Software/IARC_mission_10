@@ -108,6 +108,7 @@ class ExploreDrone:
 
 def main():
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     """Test TCP Socket Client and test git access from RPi."""
     # create an INET, STREAMing socket, this is TCP
@@ -128,6 +129,23 @@ def main():
     #     # connect to the server
     #     sock.connect(("rpi1", 8000))
 
+=======
+
+    # coords_list = []
+    coords_list = queue.Queue()
+    coords_list.put((1, 2))
+    coords_list.put((0, 0))
+    coords_list.put((6, 7))
+    ExploreDrone("rpi2", 8000, coords_list)
+
+    # """Test TCP Socket Client."""
+    # # create an INET, STREAMing socket, this is TCP
+
+    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+    #     # connect to the server
+    #     sock.connect(("rpi1", 8000))
+
+>>>>>>> origin/networking
     #     for coord in coords_list:
             
     #         print("HELLO")
@@ -141,3 +159,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
