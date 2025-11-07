@@ -107,6 +107,12 @@ class ExploreDrone:
         tcp_thread.join()
 
 def main():
+<<<<<<< HEAD
+=======
+    """Test TCP Socket Client and test git access from RPi."""
+    # create an INET, STREAMing socket, this is TCP
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+>>>>>>> 0ab63e25e04faf7e339ba2c9cb68b8fb6144a89f
 
     # coords_list = []
     coords_list = queue.Queue()
