@@ -3,7 +3,7 @@ print(cv2.getBuildInformation())
 
 gst_pipeline = (
 	"nvarguscamerasrc sensor_id=0"
-	"video/x-raw(memory:NVMM), width=1920. height=1080, framerate=30/01 !"
+	"video/x-raw(memory:NVMM), width=3280. height=2464, framerate=30/01 !"
 	"nvvidconv !"
 	"videoconvert ! "
 	"video/x-raw, format=BGR ! appsink"
