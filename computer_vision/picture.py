@@ -23,7 +23,7 @@ ret, frame = cap.read()
 # If the frame was captured successfully, ret will be True
 if ret:
     # Save the captured frame as an image
-    cv2.imwrite("captured_image.jpg", frame)
+    cv2.imwrite("/home/maav/IARC_mission10/computer_vision/output_images/captured_image.jpg", frame)
     print("Image saved as captured_image.jpg")
 else:
     print("Failed to capture image")
