@@ -32,6 +32,16 @@ All the code we actually run for navigation is in software_ws/src/px4_ros_com/sr
 
 ---------------------------------------------------
 
+To make sure the drone will actually fly in gazebo, run (in software_ws):
+
+ros2 topic list
+
+If you see a lot of /fmu/out/ topics, you're good to go!
+
+(also to get info about a msg, use "ros2 interface show px4_msgs/msg/<message>")
+
+---------------------------------------------------
+
 Run gazebo with sdf (world) file
 1. cd int PX4-Autopilot
 2. PX4_GZ_WORLD=<world name here> make px4_sitl gz_x500

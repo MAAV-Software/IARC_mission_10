@@ -108,6 +108,7 @@ public:
 				// this->publish_vehicle_command(VehicleCommand::VEHICLE_CMD_DO_SET_MODE, 1, 6);
 
 				switch_to_offboard();
+				rclcpp::sleep_for(200ms);
 				arm();
 
 				// Arm the vehicle
@@ -260,7 +261,7 @@ void OffboardControl::publish_offboard_control_mode()
  */
 void OffboardControl::publish_trajectory_setpoint()
 {
-    if (!switched_to_offboard_) return;
+    // if (!switched_to_offboard_) return;
 
     static bool going_to_b = true;
 
