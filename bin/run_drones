@@ -10,7 +10,7 @@ case $1 in
     python3 drones/run_manager.py
     ;;
 
-  "stop")
+  "explorer")
     echo "starting explorer server ..."
     python3 drones/run_explorer.py
     ;;
