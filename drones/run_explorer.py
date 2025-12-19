@@ -24,7 +24,7 @@ def map_0(img_dir, coords_list):
                     coords_list.append((loc_placeholder, x_min / img_width, y_min / img_height, x_max / img_width, y_max / img_height))
 
             # Run the predictions
-            current_dir = pathlib.Path.cwd()
+            current_dir = pathlib.Path(__file__).parent
             model_path = current_dir / "weights" / "yolo-weights" 
             model = YOLOWorld(model_path)
             image_path = f"{img_dir}/{entry.name}" # Output from the camera script
@@ -37,7 +37,7 @@ def map_0(img_dir, coords_list):
 def main():
 
     # dir for images (Using blender training images for now), will need to update with real drone images later
-    current_dir = pathlib.Path.cwd()
+    current_dir = pathlib.Path(__file__).parent
     img_dir = current_dir.parent / "images"
     coords_list = []
     map_0(img_dir, coords_list)
