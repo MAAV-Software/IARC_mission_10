@@ -7,7 +7,7 @@ import queue
 class ExploreDrone:
     "Construct an instance of an explorer Drone"
 
-    def __init__(self, host, port, coords):
+    def __init__(self, host, port, manager_host, manager_port, coords):
         """Construct a Manager instance and start listening for messages."""
 
         self.host = host
@@ -15,6 +15,8 @@ class ExploreDrone:
         self.coords = coords
         self.startup = True
         self.shutdown_flag = False
+        self.manager_host = manager_host
+        self.manager_port = manager_port
 
         self.register()
         self.run_drone()
@@ -89,23 +91,25 @@ class ExploreDrone:
         self.send_coords()
 
     def send_coords(self):
-        if self.coords.empty():
+        if len(self.coords) == 0:
             self.send_finished()
             self.shutdown_flag = True
             return
         
-        coord = self.coords.get()
+        coord = self.coords.pop(0)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect((self.manager_host, self.manager_port))
             message = json.dumps({
                 "message_type": "coordinates",
+                "host": self.host,
+                "port": self.port,
                 "coords": coord
             })
             sock.sendall(message.encode('utf-8'))
     
     def register(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect((self.manager_host, self.manager_port))
             message = json.dumps({
                 "message_type": "registration",
                 "drone_host": self.host,
@@ -115,7 +119,7 @@ class ExploreDrone:
 
     def send_finished(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect((self.manager_host, self.manager_port))
             message = json.dumps({
                 "message_type": "finished",
                 "drone_host": self.host,

@@ -2,6 +2,7 @@
 import socket
 import json
 import threading
+import pathlib
 
 class ManagerDrone:
     "Construct an instance of the main drone"
@@ -84,14 +85,15 @@ class ManagerDrone:
         
     # adds one pair of coords
     def handle_coordinates(self, message_dict):
+        worker_host = message_dict["host"]
+        worker_port = message_dict["port"]
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi2", 8000)) 
+            sock.connect((worker_host, worker_port)) 
             self.coords.append(message_dict["coords"])
             message = json.dumps({
                 "message_type": "coords_ack"
             })
             sock.sendall(message.encode('utf-8'))
-            print(self.coords)
     
     def handle_registration(self, message_dict):
         drone_host = message_dict["drone_host"]
@@ -120,3 +122,17 @@ class ManagerDrone:
         tcp_thread = threading.Thread(target=self.tcp_server)
         tcp_thread.start()
         tcp_thread.join()
+
+        current_dir = pathlib.Path(__file__).parent
+        root_dir = current_dir.parent.parent
+        output_dir = root_dir / "output"
+        output_dir.mkdir(exist_ok=True)  # creates folder if missing
+        file_path = output_dir / "output-0.txt"
+
+        with open(file_path, "w") as f: # Clear the output file
+            pass
+        with open(file_path, "a") as f: # Write the coords into it
+            for coord in self.coords:
+                f.write(f"{coord[0]} {coord[1]} {coord[2]} {coord[3]} {coord[4]}\n")
+    
+            
