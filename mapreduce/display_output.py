@@ -51,6 +51,7 @@ for line in sys.stdin:
     grid_y_idx = int(local_y * (10**scale))
     grid[grid_y_idx, grid_x_idx] = 1 # numpy arrays go rows by columns, so it would actually be like (y, x)
 
+grid = grid.astype(int)
 with open(output_path, "w") as f:
     pass
 

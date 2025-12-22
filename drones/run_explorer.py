@@ -80,7 +80,7 @@ def map_0(drone_output, coords_list):
         model = YOLOWorld(model_path)
         image = cv2.imread(image_path)
         img_height, img_width, _ = image.shape
-        results = model.predict(image,conf=0.4, verbose=False)
+        results = model.predict(image,conf=0.2, verbose=False)
         bounding_boxes = results[0].boxes
         all_results[camera_loc] = bounding_boxes
         print_output(all_results, camera_loc, img_width, img_height)
