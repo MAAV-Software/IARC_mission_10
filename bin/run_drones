@@ -3,11 +3,16 @@
 set -Eeuo pipefail
 set -x
 
-# Parse argument.  $1 is the first argument
+# Parse argument.  $1 is the first argument to run the drones
 case $1 in
   "manager")
     echo "starting manager drone ... "
     python3 drones/run_manager.py
+
+    # Now run the MapReduce pipeline through the manager
+    python3 mapreduce/map1.py < output/output-0.txt
+    python3 mapreduce/map2.py < output/map-1-output.txt
+    python3 mapreduce/display_output.py < output/map-2-output.txt
     ;;
 
   "explorer")

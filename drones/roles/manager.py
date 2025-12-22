@@ -12,6 +12,12 @@ class ManagerDrone:
 
         self.host = host
         self.port = port
+        self.bounds = [ # Goes in order top left, top right, bottom left, bottom right
+            (-3.613, 0.855),
+            (-3.613, 7.051),
+            (0.7646, 0.855),
+            (0.7646, 7.051),
+        ] # These can be hard-coded, as we will be allowed to gather these coordinates beforehand
         self.coords = []
         self.exp_drones = {}
         self.finished_drones = 0
@@ -126,13 +132,21 @@ class ManagerDrone:
         current_dir = pathlib.Path(__file__).parent
         root_dir = current_dir.parent.parent
         output_dir = root_dir / "output"
+        mapreduce_dir = root_dir / "mapreduce"
         output_dir.mkdir(exist_ok=True)  # creates folder if missing
         file_path = output_dir / "output-0.txt"
+        bound_path = mapreduce_dir / "world_bounds.txt"
+
+        with open(bound_path, "w") as f: # Clear the output file
+            pass
+        with open(bound_path, "a") as f: # Write the world bounds into it
+            for bound in self.bounds:
+                f.write(f"{bound[0]} {bound[1]}\n")
 
         with open(file_path, "w") as f: # Clear the output file
             pass
         with open(file_path, "a") as f: # Write the coords into it
             for coord in self.coords:
-                f.write(f"{coord[0]} {coord[1]} {coord[2]} {coord[3]} {coord[4]}\n")
+                f.write(f"{coord[0]} {coord[1]} {coord[2]} {coord[3]} {coord[4]} {coord[5]} {coord[6]} {coord[7]}\n")
     
             
