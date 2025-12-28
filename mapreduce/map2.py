@@ -43,11 +43,11 @@ for line in sys.stdin:
 
     # Calculate the origin point
     origin_x = float(x_loc) - float(mid_x)
-    origin_y = float(y_loc) - mid_y
+    origin_y = float(y_loc) + float(mid_y)
 
     # Now add the offset to the origin to get the global coordinate (this is still simulated using blender but the workflow should be the same but with GPS)
     global_x = round(origin_x + delt_x, scale)
-    global_y = round(origin_y + delt_y, scale)
+    global_y = round(origin_y - delt_y, scale)
     
     with open(map_output, "a") as f:
         f.write(f"{key} {global_x} {global_y}\n")

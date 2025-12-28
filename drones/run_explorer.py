@@ -47,10 +47,10 @@ def take_picture(img_dir):
 
     picture_paths = []
     with os.scandir(img_dir) as entries:
-        for entry in entries:
+        for entry in sorted(entries, key=lambda e: e.stat().st_mtime): # Make sure that the files are sorted by name since we want to preserve order
             image_path = img_dir / entry.name
+            print(image_path)
             picture_paths.append(image_path)
-    
 
     for i in range(len(camera_locs)):
         picture_and_locs.append((camera_locs[i], picture_paths[i]))
@@ -76,11 +76,12 @@ def map_0(drone_output, coords_list):
         # Run the predictions
         camera_loc, image_path = drone_output[i] # Output from the camera script
         current_dir = pathlib.Path(__file__).parent
-        model_path = current_dir / "weights" / "yolo-weights.pt" 
+        model_path = current_dir / "weights" / "12-2-25.pt" 
         model = YOLOWorld(model_path)
         image = cv2.imread(image_path)
         img_height, img_width, _ = image.shape
-        results = model.predict(image,conf=0.2, verbose=False)
+        results = model.predict(image,conf=0.4, verbose=False)
+        # results[0].show()
         bounding_boxes = results[0].boxes
         all_results[camera_loc] = bounding_boxes
         print_output(all_results, camera_loc, img_width, img_height)

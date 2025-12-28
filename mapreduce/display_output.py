@@ -86,6 +86,7 @@ for line in sys.stdin:
     # Bias the coordinates, similar to float point representation in 370
     local_x = float(loc_x) - x_bias
     local_y = float(loc_y) - y_bias
+    # print(local_x, local_y)
 
     if local_x >= world_bounds[3][0] or local_y >= world_bounds[3][1]: # Those values represent the max bounds
         # print(f"Out of bounds max {local_x} {local_y} coming from {loc_x} {loc_y}")
@@ -112,6 +113,7 @@ cmap = ListedColormap(["blue", "red"])
 plt.imshow(grid, cmap=cmap)
 plt.colorbar(ticks=[0, 1])
 plt.title("0 = Blue, 1 = Red")
+plt.gca().invert_yaxis()
 plt.savefig("mine_detections.png", dpi=300) 
 plt.show()
 
