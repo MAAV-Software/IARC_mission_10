@@ -108,13 +108,14 @@ with open(output_path, "a") as f:
         # Convert each element to string and join with spaces (or commas)
         f.write(" ".join(map(str, row)) + "\n")
 
-cmap = ListedColormap(["blue", "red"])
+cmap = ListedColormap(["white", "red"])
 
-plt.imshow(grid, cmap=cmap)
-plt.colorbar(ticks=[0, 1])
-plt.title("0 = Blue, 1 = Red")
-plt.gca().invert_yaxis()
-plt.savefig("mine_detections.png", dpi=300) 
-plt.show()
+# Comment this out when running the entire pipeline, but can uncomment for debugging purposes
+# plt.imshow(grid, cmap=cmap)
+# plt.colorbar(ticks=[0, 1])
+# plt.title("0 = white, 1 = Red")
+# plt.gca().invert_yaxis()
+# plt.savefig("mine_detections.png", dpi=300) 
+# plt.show()
 
 

@@ -13,6 +13,8 @@ case $1 in
     python3 mapreduce/map1.py < output/output-0.txt
     python3 mapreduce/map2.py < output/map-1-output.txt
     python3 mapreduce/display_output.py < output/map-2-output.txt
+    ./mapreduce/path_find < output/grid-output.txt > output/path-output.txt
+    python3 mapreduce/display_path.py < output/path-output.txt
     ;;
 
   "explorer")
