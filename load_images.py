@@ -13,3 +13,4 @@ else:
     print(f"Directory '{dest_path}' did not exist and we created it now.")
 
 shutil.move(images_path, dest_path)
+os.mkdir(images_path)

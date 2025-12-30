@@ -111,6 +111,17 @@ vector<Node> get_square_of_radius(int radius, Node center_node, int height_bound
 
 }
 
+void print_path_on_grid(vector<vector<int>> &grid, vector<Node> path, int path_width, int height, int width, int val){
+    for(int i = 0; i < path.size(); ++i){
+        vector<Node> squircle_nodes = get_square_of_radius(path_width / 2, path[i], height, width);
+        grid[path[i].i][path[i].j] = val;
+        for(int x = 0; x < squircle_nodes.size(); ++x){
+            grid[squircle_nodes[x].i][squircle_nodes[x].j] = val;
+        }
+        // update the path, 2 represents the path on the grid
+    }
+}
+
 // read in the mine detections from the python mapreduce files
 void read_in_grid(vector<vector<int>> &grid, int &rows, int &cols, double &footlong_width, double &footlong_height){
     vector<int> row;
@@ -136,7 +147,7 @@ void read_in_grid(vector<vector<int>> &grid, int &rows, int &cols, double &footl
     cols = num_cols;
 }
 
-bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vector<Node> &path, int path_width, vector<vector<int>> &final_grid){
+bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vector<Node> &path, int path_width){
 
     queue<pair<Node, vector<Node>>> search_nodes;
     vector<Node> temp_path;
@@ -167,16 +178,8 @@ bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vec
             }
             if(stopping_condition){
                 path_to_node.push_back(curr_search_node);
-                for(int i = 0; i < path_to_node.size(); ++i){
-                    squircle_nodes = get_square_of_radius(path_width / 2, path_to_node[i], height, width);
-                    grid[path_to_node[i].i][path_to_node[i].j] = 2;
-                    for(int x = 0; x < squircle_nodes.size(); ++x){
-                        grid[squircle_nodes[x].i][squircle_nodes[x].j] = 2;
-                    }
-                    // update the path, 2 represents the path on the grid
-                }
-                final_grid = grid;
-                path_found = true; 
+                path_found = true;
+                path = path_to_node;
                 break;
             }
         }
@@ -266,6 +269,7 @@ bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vec
             }
         }
     }
+
     return path_found;
 }
 
@@ -286,19 +290,30 @@ int main(){
     int right = cols;
     bool path_found = false;
     int final_path_width = 1;
-    vector<vector<int>> final_grid;
     vector<Node> path;
+    vector<vector<Node>> paths;
 
     // Use binary search to find a path of the largest width that can still find a path
     while(!(left > right)){
         int path_width = left + (right - left) / 2;
-        path_found = BFS_search(grid, explored_vals, path, path_width, final_grid);
+        path_found = BFS_search(grid, explored_vals, path, path_width);
         if(!path_found){ // path is too wide, doesn't fit
             right = path_width - 1;
         }
         else{ // narrow enough, but there could be a wider path that we could use
             final_path_width = path_width;
             left = path_width + 1;
+            paths.push_back(path);
+        }
+        // cout << "The left and right bounds are: " << left << " " << right << '\n';
+    }
+
+    for(int i = 0; i < paths.size(); ++i){
+        if(i == paths.size() - 1){
+            print_path_on_grid(grid, paths[i], final_path_width, rows, cols, 2);
+        }
+        else{
+            print_path_on_grid(grid, paths[i], final_path_width, rows, cols, 3);
         }
     }
 
@@ -306,5 +321,5 @@ int main(){
     double path_width = final_path_width / footlong_width;
     double path_height = final_path_width / footlong_height;
     cout << path_width << " " << path_height << " \n";
-    print_grid(final_grid, final_path_width);
+    print_grid(grid, final_path_width);
 }

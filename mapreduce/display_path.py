@@ -20,10 +20,10 @@ for line in sys.stdin:
 
 grid = np.array(grid)
 
-cmap = ListedColormap(["white", "red", "green"])
+cmap = ListedColormap(["white", "red", "green", "blue"])
 plt.figure(figsize=(10, 10))
 plt.imshow(grid, cmap=cmap)
-plt.colorbar(ticks=[0, 1, 2])
+plt.colorbar(ticks=[0, 1, 2, 3])
 plt.title(f"Mine = Red, Path = Green, Path_width = {path_width}, Path Height = {path_height}")
 plt.gca().invert_yaxis()
 plt.savefig("output_path.png", dpi=300) 

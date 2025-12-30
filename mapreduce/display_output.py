@@ -113,12 +113,13 @@ with open(output_path, "a") as f:
 
 cmap = ListedColormap(["white", "red"])
 
+
+plt.imshow(grid, cmap=cmap)
+plt.colorbar(ticks=[0, 1])
+plt.title("0 = white, 1 = Red")
+plt.gca().invert_yaxis()
+plt.savefig("mine_detections.png", dpi=300) 
 # Comment this out when running the entire pipeline, but can uncomment for debugging purposes
-# plt.imshow(grid, cmap=cmap)
-# plt.colorbar(ticks=[0, 1])
-# plt.title("0 = white, 1 = Red")
-# plt.gca().invert_yaxis()
-# plt.savefig("mine_detections.png", dpi=300) 
 # plt.show()
 
 
