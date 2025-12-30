@@ -69,8 +69,8 @@ dw = world_width / map_width
 dh = world_height / map_height
 
 # Represent the number of pixels for the 1 ft border around each mine
-zone_radius_width = int(1 / dw)
-zone_radius_height = int(1 / dh)
+zone_radius_width = 1 / dw
+zone_radius_height = 1 / dh
 # print(zone_radius_width, zone_radius_height)
 # print(map_width, map_height)
 
@@ -97,11 +97,14 @@ for line in sys.stdin:
     
     grid_x_idx = int(local_x * (10**scale))
     grid_y_idx = int(local_y * (10**scale))
-    plot_zones(grid, zone_radius_width, zone_radius_height, (grid_x_idx, grid_y_idx))
+    plot_zones(grid, int(zone_radius_width), int(zone_radius_height), (grid_x_idx, grid_y_idx))
 grid = grid.astype(int)
 
 with open(output_path, "w") as f:
     pass
+
+with open(output_path, "a") as f:
+    f.write(f"{zone_radius_width} {zone_radius_height}\n")
 
 with open(output_path, "a") as f:
     for row in grid:

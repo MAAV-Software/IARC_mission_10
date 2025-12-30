@@ -50,7 +50,8 @@ def take_picture(img_dir):
         for entry in sorted(entries, key=lambda e: e.stat().st_mtime): # Make sure that the files are sorted by name since we want to preserve order
             image_path = img_dir / entry.name
             print(image_path)
-            picture_paths.append(image_path)
+            if entry.name != ".DS_Store":
+                picture_paths.append(image_path)
 
     for i in range(len(camera_locs)):
         picture_and_locs.append((camera_locs[i], picture_paths[i]))
@@ -91,8 +92,11 @@ def main():
     hostname = socket.gethostname()
     print(hostname)
     # dir for images (Using blender training images for now), will need to update with real drone images later
+
+    # Use this when we are actually taking pictures from the drone, upload the images taken from the drone to this path
     current_dir = pathlib.Path(__file__).parent
-    img_dir = current_dir.parent / "images"
+    img_dir = current_dir.parent / "images" / "training_images" # Use a folder called training_images for now, but will need to adapt this parameter for drone pics later
+
     coords_list = []
     drone_output = take_picture(img_dir)
     map_0(drone_output, coords_list)
