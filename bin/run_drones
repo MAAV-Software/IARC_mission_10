@@ -3,6 +3,9 @@
 set -Eeuo pipefail
 set -x
 
+source /opt/miniconda3/etc/profile.d/conda.sh
+conda activate networking
+
 # Parse argument.  $1 is the first argument to run the drones
 case $1 in
   "manager")
@@ -19,7 +22,7 @@ case $1 in
 
   "explorer")
     echo "starting explorer server ..."
-    python3 drones/run_explorer.py
+    python3 /Users/dervint/MAAV/networking/Networking_VM/drones/ru
     ;;
 
   *)

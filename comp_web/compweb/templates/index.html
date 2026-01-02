@@ -6,7 +6,10 @@
 </head>
 <body>
     <div>
-        Hello World
+        Click the button below to send a message!
+        <form action="{{ url_for('send_message') }}?target={{ request.path }}" method="post" enctype="multipart/form-data">
+            <input type="submit" name="submit" value="Submit">
+        </form>
     </div>
 </body>
 </html>

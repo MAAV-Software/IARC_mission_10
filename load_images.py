@@ -1,8 +1,8 @@
 import os
 import shutil
 
-images_path = "/Users/dervint/Desktop/Clubs/MAAV/pfm1-mines/training_images"
-dest_path = "/Users/dervint/Desktop/Clubs/MAAV/networking/Networking_VM/images"
+images_path = "/Users/dervint/MAAV/pfm1-mines/training_images"
+dest_path = "/Users/dervint/MAAV/networking/Networking_VM/images"
 
 if os.path.exists(dest_path):
     shutil.rmtree(dest_path)
