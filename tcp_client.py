@@ -96,7 +96,7 @@ class ExploreDrone:
         
         coord = self.coords.get()
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect(("192.168.1.35", 8000))
             message = json.dumps({
                 "message_type": "coordinates",
                 "coords": coord
@@ -105,7 +105,7 @@ class ExploreDrone:
     
     def register(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect(("192.168.1.35", 8000))
             message = json.dumps({
                 "message_type": "registration",
                 "drone_host": self.host,
@@ -115,7 +115,7 @@ class ExploreDrone:
 
     def send_finished(self):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(("rpi1", 8000))
+            sock.connect(("192.168.1.35", 8000))
             message = json.dumps({
                 "message_type": "finished",
                 "drone_host": self.host,
@@ -136,7 +136,7 @@ def main():
     coords_list.put((1, 2))
     coords_list.put((0, 0))
     coords_list.put((6, 7))
-    ExploreDrone("rpi2", 8000, coords_list)
+    ExploreDrone("192.168.1.22", 8000, coords_list)
 
     # """Test TCP Socket Client."""
     # # create an INET, STREAMing socket, this is TCP

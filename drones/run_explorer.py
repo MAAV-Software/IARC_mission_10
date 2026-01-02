@@ -100,8 +100,8 @@ def main():
     coords_list = []
     drone_output = take_picture(img_dir)
     map_0(drone_output, coords_list)
-    ExploreDrone(hostname, 8001, hostname, 8000, coords_list) # For now, just simulating on one laptop, so same hostname for both manager and explorer
-
+    ExploreDrone("192.168.1.22", 8001, "192.168.1.35", 8000, coords_list) # For now, just simulating on one laptop, so same hostname for both manager and explorer
+    # ExploreDrone("192.168.1.22", 8001, "192.168.1.22", 8000, coords_list)
 
 if __name__ == "__main__":
     main()

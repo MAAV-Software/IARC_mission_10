@@ -1,0 +1,6 @@
+pyproject.toml
+compweb.egg-info/PKG-INFO
+compweb.egg-info/SOURCES.txt
+compweb.egg-info/dependency_links.txt
+compweb.egg-info/requires.txt
+compweb.egg-info/top_level.txt

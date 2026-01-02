@@ -18,7 +18,9 @@ class ExploreDrone:
         self.manager_host = manager_host
         self.manager_port = manager_port
 
+        # print(self.manager_host)
         self.register()
+        # print("Finished registering!")
         self.run_drone()
 
 

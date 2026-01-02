@@ -12,7 +12,7 @@ def main():
     # closed when an exception is raised or control flow returns.
     hostname = socket.gethostname()
     print(hostname)
-    main_drone = ManagerDrone(hostname, 8000)
+    main_drone = ManagerDrone("192.168.1.22", 8000)
 
 if __name__ == "__main__":
     main()

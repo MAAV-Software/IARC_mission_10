@@ -110,6 +110,12 @@ class ManagerDrone:
             "drone_port": drone_port,
             "status": "working"
         }
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.connect((drone_host, drone_port)) 
+            message = json.dumps({
+                "message_type": "registration_ack"
+            })
+            sock.sendall(message.encode('utf-8'))
 
     def handle_finished(self, message_dict):
         drone_host = message_dict["drone_host"]

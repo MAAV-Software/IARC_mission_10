@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <queue>
 #include <random>
 #include <chrono>
 
@@ -206,7 +207,7 @@ bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vec
             }
         }
 
-        if(curr_search_node.j <= width - path_width){
+        if(curr_search_node.j < width - path_width){
             Node up_node;
             up_node.i = curr_search_node.i;
             up_node.j = curr_search_node.j + path_width;
@@ -227,7 +228,7 @@ bool BFS_search(vector<vector<int>> grid, vector<vector<int>> explored_vals, vec
             }
         }
 
-        if(curr_search_node.i <= height - path_width){
+        if(curr_search_node.i < height - path_width){
             Node up_node;
             up_node.i = curr_search_node.i + path_width;
             up_node.j = curr_search_node.j;
