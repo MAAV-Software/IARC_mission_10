@@ -22,7 +22,7 @@ case $1 in
 
   "explorer")
     echo "starting explorer server ..."
-    python3 /Users/dervint/MAAV/networking/Networking_VM/drones/ru
+    python3 /Users/dervint/MAAV/networking/Networking_VM/drones/run_explorer.py
     ;;
 
   *)

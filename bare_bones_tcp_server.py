@@ -1,7 +1,19 @@
+#!/usr/bin/env python3
+
 """Example TCP socket server."""
 import socket
 import json
+import subprocess
 
+def handle_msg(message_dict):
+    if message_dict["message_type"] == "run_drones":
+        print("Command to run drones is received!")
+        subprocess.run(["./bin/run_drones", "explorer"],
+            cwd="/Users/dervint/MAAV/networking/Networking_VM",
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
 def main():
     """Test TCP Socket Server."""
@@ -12,7 +24,7 @@ def main():
 
         # Bind the socket to the server
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.bind(("localhost", 8000))
+        sock.bind(("192.168.1.22", 8000))
         sock.listen()
 
         # Socket accept() will block for a maximum of 1 second.  If you
@@ -57,7 +69,9 @@ def main():
                 message_dict = json.loads(message_str)
             except json.JSONDecodeError:
                 continue
-            print(message_dict)
+            handle_msg(message_dict)
+    
+
 
 
 if __name__ == "__main__":
