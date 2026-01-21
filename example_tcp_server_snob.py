@@ -45,6 +45,8 @@ def handle_message(message_dict):
 
 
 
+
+
 # 1We playing a real diamond quarter your not even good enough to lick the dirt off my cleats
 
 # 3Shut up idiot
