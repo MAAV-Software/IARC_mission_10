@@ -21,9 +21,13 @@ Finally upload (middle of header)
 
 Terminal 4:
 cd into SUAS_24-25/software_ws
+
 source /opt/ros/humble/setup.bash
+
 colcon build --packages-select px4_ros_com 
+
 source install/setup.bash 
+
 ros2 run px4_ros_com offboard_control
 
 ---------------------------------------------------
