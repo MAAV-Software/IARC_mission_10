@@ -4,39 +4,75 @@ import json
 
 print("Hello World")
 
+with open('amin_swati.txt', 'r') as file:
+    lines = file.readlines() #lines is a list
+
 def handle_message(message_dict):
-    corrected_dict = message_dict["message"]
-    if(corrected_dict == "we playing a real diamond quarter your not even good enough to lick the dirt off my cleats"):
-        send("watch it jerk")
-        print("watch it jerk")
+    corrected_dict = message_dict["message"].strip()
+    print(corrected_dict)
+    if(corrected_dict == "JEIOSHDFKJL:SH 1"):
+        send(lines[0])
+        print(lines[0])
 
-    if(corrected_dict == "shut up idiot"):
-        send("moron")
-        print("moron")
+    if(corrected_dict == "JEIOSHDFKJL:SH 2"):
+        send(lines[1])
+        print(lines[1])
 
-    if(corrected_dict == "scab eater"):
-        send("butt sniffer")
-        print("butt sniffer")
+    if(corrected_dict == "JEIOSHDFKJL:SH 3"):
+        send(lines[2])
+        print(lines[2])
 
-    if(corrected_dict == "pus licker"):
-        send("fart smeller")
-        print("fart smeller")
-
-    if(corrected_dict == "you eat dog crap for breakfast geek"):
-        send("you mix wheaties with your mommas toe jam")
-        print("you mix wheaties with your mommas toe jam")
-        
-    if(corrected_dict == "you bob for apples in toilet and like it"):
-        send("you play ball like a girl")
-        print("you play ball like a girl")
+    if(corrected_dict == "JEIOSHDFKJL:SH 4"):
+        send(lines[3])
+        print(lines[3])
     
-    if(corrected_dict == "tomorrow noon at our field"):
-        send("count on it pee drinking crap face")
-        print("count on it pee drinking crap face")
+    if(corrected_dict == "JEIOSHDFKJL:SH 5"):
+        send(lines[4])
+        print(lines[4])
 
-    if(corrected_dict == "what did you say"):
-        send("you heard me")
-        print("you heard me")
+    if(corrected_dict == "JEIOSHDFKJL:SH 6"):
+        send(lines[5])
+        print(lines[5])
+    
+    if(corrected_dict == "JEIOSHDFKJL:SH 7"):
+        send(lines[6])
+        print(lines[6])
+    
+    if(corrected_dict == "JEIOSHDFKJL:SH 8"):
+        send(lines[7])
+        print(lines[7])
+    
+    if(corrected_dict == "JEIOSHDFKJL:SH 9"):
+        send(lines[8])
+        print(lines[8])
+
+    if(corrected_dict == "JEIOSHDFKJL:SH 10"):
+        send(lines[9])
+        print(lines[9])
+        
+    if(corrected_dict == "JEIOSHDFKJL:SH 11"):
+        send(lines[10])
+        print(lines[10])
+
+    if(corrected_dict == "JEIOSHDFKJL:SH 12"):
+        send(lines[11])
+        print(lines[11])
+    
+    if(corrected_dict == "JEIOSHDFKJL:SH 13"):
+        send(lines[12])
+        print(lines[12])
+    
+    if(corrected_dict == "JEIOSHDFKJL:SH 14"):
+        send(lines[13])
+        print(lines[13])
+
+    if(corrected_dict == "JEIOSHDFKJL:SH 15"):
+        send(lines[14])
+        print(lines[14])
+
+    if(corrected_dict == "JEIOSHDFKJL:SH 16"):
+        send(lines[15])
+        print(lines[15])
 
 
 
@@ -72,6 +108,7 @@ def handle_message(message_dict):
 
 
 def send(message):
+
     """Test TCP Socket Client."""
     # create an INET, STREAMing socket, this is TCP
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -87,6 +124,9 @@ def send(message):
 
 def main():
     """Test TCP Socket Server."""
+    with open('amin_swati.txt', 'w') as file:
+        for i in range(1,17):
+            file.write("Message "+ str(i) + "\n")
     # Create an INET, STREAMing socket, this is TCP
     # Note: context manager syntax allows for sockets to automatically be
     # closed when an exception is raised or control flow returns.

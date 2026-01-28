@@ -12,7 +12,7 @@ def main():
         sock.connect(("localhost", 8000))
 
         # send a message
-        message = json.dumps({"message": "we playing a real diamond quarter your not even good enough to lick the dirt off my cleats"})
+        message = json.dumps({"message": "Message 2"})
         sock.sendall(message.encode('utf-8'))
 
 
