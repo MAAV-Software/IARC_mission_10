@@ -20,10 +20,10 @@ def print_output(bounding_boxes, img_width, img_height):
         print("norm x min: ", x_min / img_width, " ", "norm y_min: ", y_min / img_height, " ", "norm x_max: ", x_max / img_width, " ", "norm y_max: ", y_max / img_height, " ")
 
 # Load the YOLO world model
-model_path = "./weights/1-2-26.pt"
+model_path = "./weights/blender-weights.pt"
 model = YOLOWorld(model_path)
 
-image_path = "./test_images/IMG_5847pfm1-mine.jpeg" # Output from the camera script
+image_path = "/Users/dervint/MAAV/IARC_25-26/taken_images/dervint_2_0.png" # Output from the camera script
 
 # Read in the image and open it
 image = cv2.imread(image_path)
