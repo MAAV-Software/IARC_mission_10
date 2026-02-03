@@ -2,6 +2,7 @@ from ultralytics import YOLOWorld
 from PIL import Image
 import cv2
 import numpy as np
+import time
     
 # Function to loop through and print out the classes, confidence and bounding box coordinates
 def print_output(bounding_boxes, img_width, img_height):
@@ -18,10 +19,12 @@ def print_output(bounding_boxes, img_width, img_height):
         print("Class:", class_name)
         print("Confidence:", conf)
         print("norm x min: ", x_min / img_width, " ", "norm y_min: ", y_min / img_height, " ", "norm x_max: ", x_max / img_width, " ", "norm y_max: ", y_max / img_height, " ")
-
+init_time = time.time()
 # Load the YOLO world model
 model_path = "./weights/blender-weights.pt"
 model = YOLOWorld(model_path)
+end_time = time.time()
+print(f"Elapsed Time: {end_time - init_time}")
 
 image_path = "/Users/dervint/MAAV/IARC_25-26/taken_images/dervint_2_0.png" # Output from the camera script
 
@@ -34,7 +37,7 @@ print(img_width, img_height)
 
 # Predict using the YOLO model and show the result
 results = model.predict(image,conf=0.3)
-results[0].show()
+# results[0].show()
 
 # Get the bounding boxes
 bounding_boxes = results[0].boxes  # Bounding boxes for the YOLO Predictions Image

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+file=${1:-test}
+rpicam-still -n -t 1 -o $file.jpg
