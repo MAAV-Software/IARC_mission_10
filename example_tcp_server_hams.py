@@ -124,9 +124,13 @@ def send(message):
 
 def main():
     """Test TCP Socket Server."""
-    with open('amin_swati.txt', 'w') as file:
-        for i in range(1,17):
-            file.write("Message "+ str(i) + "\n")
+    to_send = []
+    with open('DervinSmellsLikePoop.csv', 'r') as file:
+        header = file.readline()
+        for line in file:
+            x, y = line.split(",")
+            to_send.append((x,y))
+            
     # Create an INET, STREAMing socket, this is TCP
     # Note: context manager syntax allows for sockets to automatically be
     # closed when an exception is raised or control flow returns.

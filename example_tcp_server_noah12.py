@@ -21,7 +21,7 @@ def handle_message(message_dict):
 
     message = message_dict["message"]
     
-    file_path = 'amit_noah1.txt' 
+    file_path = 'results.txt' 
     try:
         with open(file_path, 'r') as file:
             content = file.readlines()
@@ -49,10 +49,9 @@ def handle_message(message_dict):
 
 
 def main():
-
-    with open("amit_noah12.txt", "w") as f:
-        for i in range(1,17):
-            f.write("JEIOSHDFKJL:SH " + str(i) + "\n")
+    
+    with open("results.txt", 'r') as file:
+        message_dict = file.readlines()
 
 
     """Test TCP Socket Server."""
@@ -70,7 +69,7 @@ def main():
         # omit this, it blocks indefinitely, waiting for a connection.
         sock.settimeout(1)
 
-        send("JEIOSHDFKJL:SH 1")
+        #send("JEIOSHDFKJL:SH 1")
 
         while True:
             # Wait for a connection for 1s.  The socket library avoids consuming
