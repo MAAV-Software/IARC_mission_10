@@ -2,110 +2,6 @@
 import socket
 import json
 
-print("Hello World")
-
-with open('amin_swati.txt', 'r') as file:
-    lines = file.readlines() #lines is a list
-
-def handle_message(message_dict):
-    corrected_dict = message_dict["message"].strip()
-    print(corrected_dict)
-    if(corrected_dict == "JEIOSHDFKJL:SH 1"):
-        send(lines[0])
-        print(lines[0])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 2"):
-        send(lines[1])
-        print(lines[1])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 3"):
-        send(lines[2])
-        print(lines[2])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 4"):
-        send(lines[3])
-        print(lines[3])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 5"):
-        send(lines[4])
-        print(lines[4])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 6"):
-        send(lines[5])
-        print(lines[5])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 7"):
-        send(lines[6])
-        print(lines[6])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 8"):
-        send(lines[7])
-        print(lines[7])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 9"):
-        send(lines[8])
-        print(lines[8])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 10"):
-        send(lines[9])
-        print(lines[9])
-        
-    if(corrected_dict == "JEIOSHDFKJL:SH 11"):
-        send(lines[10])
-        print(lines[10])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 12"):
-        send(lines[11])
-        print(lines[11])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 13"):
-        send(lines[12])
-        print(lines[12])
-    
-    if(corrected_dict == "JEIOSHDFKJL:SH 14"):
-        send(lines[13])
-        print(lines[13])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 15"):
-        send(lines[14])
-        print(lines[14])
-
-    if(corrected_dict == "JEIOSHDFKJL:SH 16"):
-        send(lines[15])
-        print(lines[15])
-
-
-
-# We playing a real diamond quarter your not even good enough to lick the dirt off my cleats
-
-# 3Shut up idiot
-
-# 5scab eater
-
-# 7Pus licker
-
-# 9You eat dog crap for breakfast geek
-
-# 11You bob for apples in toilet and like it
-
-# 13What did you say 
-
-# 15Tomorrow noon at our field
-
-# 16Get the buffalo butt breath lets go
-
-
-
-
-#2 Watch it jerk
-# 4Moron
-# 6Butt sniffer
-# 8Fart smeller
-# 10You mix wheaties with your mommas toe jam
-# 12You play ball like a girl
-# 14You heard me
-# 16Count on it pea drinking crap face
-
 
 def send(message):
 
@@ -120,17 +16,17 @@ def send(message):
         message = json.dumps({"message": message})
         sock.sendall(message.encode('utf-8'))
 
-
-
 def main():
     """Test TCP Socket Server."""
-    to_send = []
+
+    lines = []
     with open('DervinSmellsLikePoop.csv', 'r') as file:
-        header = file.readline()
-        for line in file:
-            x, y = line.split(",")
-            to_send.append((x,y))
-            
+        lines = file.readlines() #lines is a lists
+
+    for i in lines[1:]:
+        send(i)
+    send("Amin has no middle name")
+        
     # Create an INET, STREAMing socket, this is TCP
     # Note: context manager syntax allows for sockets to automatically be
     # closed when an exception is raised or control flow returns.
@@ -183,7 +79,6 @@ def main():
                 message_dict = json.loads(message_str)
             except json.JSONDecodeError:
                 continue
-            handle_message(message_dict)
 
 
 if __name__ == "__main__":

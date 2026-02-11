@@ -2,15 +2,13 @@
 import socket
 import json
 
-print("Hello World")
-
 def send(message):
     """Test TCP Socket Client."""
     # create an INET, STREAMing socket, this is TCP
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 
         # connect to the server
-        #TODO: add ip address
+        # TODO: add ip address
         sock.connect(("localhost", 8000))
 
         # send a message
@@ -18,40 +16,57 @@ def send(message):
         sock.sendall(message.encode('utf-8'))
 
 def handle_message(message_dict):
+    msg = message_dict["message"]
+    x, y = msg.strip().split(',')
+    print(x,y)
+    return x,y 
 
-    message = message_dict["message"]
+    # message = message_dict["message"]
     
-    file_path = 'results.txt' 
-    try:
-        with open(file_path, 'r') as file:
-            content = file.readlines()
-            # print(content)
-    except FileNotFoundError:
-        print(f"Error: The file '{file_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # file_path = 'results.txt' 
+    # try:
+    #     with open(file_path, 'r') as file:
+    #         content = file.readlines()
+    #         # print(content)
+    # except FileNotFoundError:
+    #     print(f"Error: The file '{file_path}' was not found.")
+    # except Exception as e:
+    #     print(f"An error occurred: {e}")
 
 
-    #identify number in message 
-    index = message.index(" ")
+    # #identify number in message 
+    # index = message.index(" ")
 
     
-    number = message[index+1:]
-    print(number)
-    try:
-        message_back = content[int(number)].strip()
-        print("sent "+ message_back)
-        send(message_back)
-    except:
-        pass
+    # number = message[index+1:]
+    # print(number)
+    # try:
+    #     message_back = content[int(number)].strip()
+    #     print("sent "+ message_back)
+    #     send(message_back)
+    # except:
+    #     pass
     #return section of content betwen "/n" and includes number
     
 
 
 def main():
+
+    all_coords = []
     
     with open("results.txt", 'r') as file:
-        message_dict = file.readlines()
+        for line in file:
+        # Find all numbers (including negatives and decimals)
+        # Regex explanation:
+        # -?    -> optional negative sign
+        # \d+   -> one or more digits
+        # \.    -> a literal decimal point
+        # \d+   -> one or more digits after the decimal
+            p1, p2, p3, p4, p5, p6 = line.strip().split(' ')
+            x = p5[2:-1]
+            y = p6[2:] 
+            print(x, y, "\n")
+            all_coords.append([x, y])
 
 
     """Test TCP Socket Server."""
@@ -70,7 +85,7 @@ def main():
         sock.settimeout(1)
 
         #send("JEIOSHDFKJL:SH 1")
-
+        
         while True:
             # Wait for a connection for 1s.  The socket library avoids consuming
             # CPU while waiting for a connection.
@@ -109,8 +124,15 @@ def main():
                 message_dict = json.loads(message_str)
             except json.JSONDecodeError:
                 continue
-            handle_message(message_dict)
-
+            if(message_dict["message"] == "Amin has no middle name"):
+                break
+            else:
+                x,y = handle_message(message_dict)
+                all_coords.append((x,y))
+            
+    with open("DervinsGOUToutBREAK.txt", 'w') as file: 
+        for item in all_coords:
+            file.write(f"{item}\n")
 
 if __name__ == "__main__":
     main()
