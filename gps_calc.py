@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-def align_coordinates(gps_coord, theta):
+def align_coordinates(gps_coord, theta): #top right corner is properly aligned, rest aren't
     new_tr_thingy = gps_coord[0] - h
     omega = (math.pi) - ((math.pi / 2) + theta)
     alpha = math.pi - ((math.pi / 2) + omega)
