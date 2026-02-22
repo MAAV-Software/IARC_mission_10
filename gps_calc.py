@@ -10,7 +10,7 @@ def align_coordinates(pivot_pt, gps_coord, theta):
     x_shift = (gps_coord[0] - pivot_pt[0])
     y_shift = gps_coord[1] - pivot_pt[1]
 
-    #rotate negatively according to theta to align w x and y axis
+    #rotate counterclockwise according to theta to align w x and y coords of pivot point
     x_final = ((x_shift*math.cos(theta) - y_shift*math.sin(theta)))
     y_final = (x_shift*math.sin(theta) + y_shift*math.cos(theta))
 
@@ -25,7 +25,7 @@ def rotate_back(pivot_pt, gps_coord, theta):
     x_shift = gps_coord[0] - pivot_pt[0]
     y_shift = gps_coord[1] - pivot_pt[1]
 
-    #rotate positively according to theta
+    #rotate clockwise according to theta
     x_final = (x_shift*math.cos(-theta) - y_shift*math.sin(-theta))
     y_final = (x_shift*math.sin(-theta) + y_shift*math.cos(-theta))
 
@@ -51,6 +51,7 @@ theta = math.atan(h/w)
 print(math.degrees(theta))
 
 #tests align_coordinates
+print(field_tl)
 aligned_tr = align_coordinates(field_tl, field_tr, theta)
 print(aligned_tr)
 
