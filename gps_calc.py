@@ -1,14 +1,80 @@
 import math
 import numpy as np
+#import socket
+#import json
 
-def align_coordinates(gps_coord, theta): #top right corner is properly aligned, rest aren't
-    new_tr_thingy = gps_coord[0] - h
-    omega = (math.pi) - ((math.pi / 2) + theta)
-    alpha = math.pi - ((math.pi / 2) + omega)
-    b = (h * math.sin(alpha) / math.sin(omega))
-    new_tr_other_thingy = gps_coord[1] + b
-    new_tr = (new_tr_thingy, new_tr_other_thingy)
-    return new_tr
+#aligns a gps coord to the x & y axis according to a pivot point & given the angle to rotate 
+#(rotating negatively/counterclockwise)
+def align_coordinates(pivot_pt, gps_coord, theta): 
+    #subtract the pivot point from the gps coord to treat the pivot as the origin 
+    x_shift = (gps_coord[0] - pivot_pt[0])
+    y_shift = gps_coord[1] - pivot_pt[1]
+
+    #rotate negatively according to theta to align w x and y axis
+    x_final = ((x_shift*math.cos(theta) - y_shift*math.sin(theta)))
+    y_final = (x_shift*math.sin(theta) + y_shift*math.cos(theta))
+
+    #translate back to actual coordinates
+    x_final += pivot_pt[0]
+    y_final += pivot_pt[1]
+
+    return (x_final, y_final)
+
+def rotate_back(pivot_pt, gps_coord, theta): 
+    #subtract the pivot point from the gps coord to treat the pivot as the origin 
+    x_shift = gps_coord[0] - pivot_pt[0]
+    y_shift = gps_coord[1] - pivot_pt[1]
+
+    #rotate positively according to theta
+    x_final = (x_shift*math.cos(-theta) - y_shift*math.sin(-theta))
+    y_final = (x_shift*math.sin(-theta) + y_shift*math.cos(-theta))
+
+    #translate back to actual coordinates
+    x_final += pivot_pt[0]
+    y_final += pivot_pt[1]
+
+    return (x_final, y_final)
+
+
+field_tl = (42.411131, -83.498292)
+field_tr = (42.411169, -83.497703)
+field_br = (42.410189, -83.497575)
+field_bl = (42.410147, -83.498169)
+
+#field_width = 49.15 #m
+#field_height = 109.82 #m
+
+w = field_tr[1] - field_tl[1]
+h = field_tr[0] - field_tl[0]
+print(w, h)
+theta = math.atan(h/w)
+print(math.degrees(theta))
+
+#tests align_coordinates
+aligned_tr = align_coordinates(field_tl, field_tr, theta)
+print(aligned_tr)
+
+aligned_br = align_coordinates(field_tl, field_br, theta)
+print(aligned_br)
+
+aligned_bl = align_coordinates(field_tl, field_bl, theta)
+print(aligned_bl)
+
+print("\n")
+
+#tests rotate back
+orig_tr = rotate_back(field_tl, aligned_tr, theta)
+print(orig_tr)
+print(field_tr == orig_tr)
+
+orig_br = rotate_back(field_tl, aligned_br, theta)
+print(orig_br)
+print(field_br == orig_br)
+
+orig_bl = rotate_back(field_tl, aligned_bl, theta)
+print(orig_bl)
+print(field_bl == orig_bl)
+
 
 #need camera GPS position, camera altitude, camera orientation (roll, pitch, yaw), camera focal length & scaling factor
 
@@ -63,29 +129,6 @@ def align_coordinates(gps_coord, theta): #top right corner is properly aligned, 
 # long_cam = 0 #longitude of camera (TODO: replace)
 # lat = lat_cam + Y/111320
 # long = long_cam + X/(111320*np.cos(roll))
-
-field_tl = (42.411131, -83.498292)
-field_tr = (42.411169, -83.497703)
-field_br = (42.410189, -83.497575)
-field_bl = (42.410147, -83.498169)
-
-field_width = 49.15
-field_height = 109.82
-
-w = field_tr[1] - field_tl[1]
-h = field_tr[0] - field_tl[0]
-print(w, h)
-theta = math.atan(h/w)
-print(math.degrees(theta))
-
-aligned_tr = align_coordinates(field_tr, theta)
-print(aligned_tr)
-
-aligned_br = align_coordinates(field_br, theta)
-print(aligned_br)
-
-aligned_bl = align_coordinates(field_bl, theta)
-print(aligned_bl)
 
 
 
