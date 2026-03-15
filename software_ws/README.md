@@ -123,3 +123,12 @@ we tried using geodetic_to_enu but that made our x and y comically large
 4/13/2025
 
 GPS coords of Milan: 42.0916, -83.6535
+
+----------------------------------------------------
+
+3/15/2026
+
+Currently need to move Amit's code from px4_single_plan to the px4_multi_vehicle_offboard fork
+To get ROS working on the rPi, we either need to set up a Docker image or flash Ubuntu 22.04 onto the rPi
+  - we prefer flashing Ubuntu
+Once ROS (and all other necessary packages) are set up, we can first test flying by running mfly_test in software_ws
