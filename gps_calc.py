@@ -2,15 +2,72 @@ import math
 import numpy as np
 #import socket
 #import json
+import re
+
+def convert_to_dec_degrees(coord1):
+    coord1str = coord1
+    result_coord = []
+
+    for i in range(0, 2):
+        #if there is an empty space at the beginning, get rid of it
+        if (coord1str[0] == " "):
+            coord1str = coord1str[1:]
+        mult_by_neg_one = False
+
+        #extract 1st D
+        separator = "°"
+        index = coord1str.find(separator)
+        D = coord1str[:index]
+        coord1str = coord1str.replace(D, '')
+        coord1str = coord1str[1:]
+        print(D)
+        print(coord1str)
+        D = float(D)
+
+        #extract 1st M
+        separator = "'"
+        index = coord1str.find(separator)
+        M = coord1str[:index]
+        coord1str = coord1str.replace(M, '')
+        coord1str = coord1str[1:]
+        print(M)
+        print(coord1str)
+        M = float(M)
+
+        #extract 1st S
+        separator = '"'
+        index = coord1str.find(separator)
+        S = coord1str[:index]
+        coord1str = coord1str.replace(S, '')
+        coord1str = coord1str[1:]
+        print(S)
+        print(coord1str)
+        S = float(S)
+
+        #extract 1st direction
+        direction = coord1str[0]
+        coord1str = coord1str[1:]
+        if ((direction == "S") or (direction == "W")):
+            mult_by_neg_one = True
+
+        #calc result
+        result = D + M/60 + S/3600
+        if (mult_by_neg_one):
+            result *= 1
+        
+        result_coord.append(result)
+    
+    return result_coord #list w 2 #s: 1st is x-coord, 2nd is y-coord
+
+
 
 #aligns a gps coord to the x & y axis according to a pivot point & given the angle to rotate 
-#(rotating negatively/counterclockwise)
 def align_coordinates(pivot_pt, gps_coord, theta): 
     #subtract the pivot point from the gps coord to treat the pivot as the origin 
     x_shift = (gps_coord[0] - pivot_pt[0])
     y_shift = gps_coord[1] - pivot_pt[1]
 
-    #rotate counterclockwise according to theta to align w x and y coords of pivot point
+    #rotate according to theta to align w x and y coords of pivot point
     x_final = ((x_shift*math.cos(theta) - y_shift*math.sin(theta)))
     y_final = (x_shift*math.sin(theta) + y_shift*math.cos(theta))
 
@@ -25,7 +82,7 @@ def rotate_back(pivot_pt, gps_coord, theta):
     x_shift = gps_coord[0] - pivot_pt[0]
     y_shift = gps_coord[1] - pivot_pt[1]
 
-    #rotate clockwise according to theta
+    #rotate according to theta
     x_final = (x_shift*math.cos(-theta) - y_shift*math.sin(-theta))
     y_final = (x_shift*math.sin(-theta) + y_shift*math.cos(-theta))
 
@@ -35,21 +92,20 @@ def rotate_back(pivot_pt, gps_coord, theta):
 
     return (x_final, y_final)
 
+#coordinates are in form D°M'S"(N/S/W/E) D°M'S"(N/S/W/E)
+field_tl = """42°24'40.07"N 83°29'53.85"W"""
+field_tr = """42°24'40.20"N 83°29'51.73"W"""
+field_br = """42°24'36.68"N 83°29'51.26"W"""
+field_bl = """42°24'36.52"N 83°29'53.40"W"""
 
-field_tl = (42.411131, -83.498292)
-field_tr = (42.411169, -83.497703)
-field_br = (42.410189, -83.497575)
-field_bl = (42.410147, -83.498169)
+field_mid = (42.4106462, -83.4982341)
+
+print(convert_to_dec_degrees(field_tl))
 
 #field_width = 49.15 #m
 #field_height = 109.82 #m
 
-w = field_tr[1] - field_tl[1]
-h = field_tr[0] - field_tl[0]
-print(w, h)
-theta = math.atan(h/w)
-print(math.degrees(theta))
-
+'''
 #tests align_coordinates
 print(field_tl)
 aligned_tr = align_coordinates(field_tl, field_tr, theta)
@@ -60,6 +116,9 @@ print(aligned_br)
 
 aligned_bl = align_coordinates(field_tl, field_bl, theta)
 print(aligned_bl)
+
+aligned_mid = align_coordinates(field_tl, field_mid, theta)
+print("middle point: ", aligned_mid)
 
 print("\n")
 
@@ -74,8 +133,8 @@ print(field_br == orig_br)
 
 orig_bl = rotate_back(field_tl, aligned_bl, theta)
 print(orig_bl)
-print(field_bl == orig_bl)
-
+print(field_bl == orig_bl) 
+'''
 
 #need camera GPS position, camera altitude, camera orientation (roll, pitch, yaw), camera focal length & scaling factor
 
@@ -138,3 +197,5 @@ TODO:
 need camera GPS position, camera altitude, camera orientation (roll, pitch, yaw), camera focal length & scaling factor
 put code into funcs & int main, send output to a txt file
 '''
+
+field_tl_1 = """42°24'40.07"N 83°29'53.85"W"""
