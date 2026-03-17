@@ -1,106 +1,153 @@
 import math
-import numpy as np
-#import socket
-#import json
-import re
+from pyproj import Transformer
 
 def convert_to_dec_degrees(coord1):
     coord1str = coord1
     result_coord = []
-
     for i in range(0, 2):
-        #if there is an empty space at the beginning, get rid of it
         if (coord1str[0] == " "):
             coord1str = coord1str[1:]
         mult_by_neg_one = False
-
-        #extract 1st D
         separator = "°"
         index = coord1str.find(separator)
         D = coord1str[:index]
         coord1str = coord1str.replace(D, '')
         coord1str = coord1str[1:]
-        print(D)
-        print(coord1str)
         D = float(D)
-
-        #extract 1st M
         separator = "'"
         index = coord1str.find(separator)
         M = coord1str[:index]
         coord1str = coord1str.replace(M, '')
         coord1str = coord1str[1:]
-        print(M)
-        print(coord1str)
         M = float(M)
-
-        #extract 1st S
         separator = '"'
         index = coord1str.find(separator)
         S = coord1str[:index]
         coord1str = coord1str.replace(S, '')
         coord1str = coord1str[1:]
-        print(S)
-        print(coord1str)
         S = float(S)
-
-        #extract 1st direction
         direction = coord1str[0]
         coord1str = coord1str[1:]
+
         if ((direction == "S") or (direction == "W")):
             mult_by_neg_one = True
-
-        #calc result
         result = D + M/60 + S/3600
         if (mult_by_neg_one):
-            result *= 1
-        
+            result *= -1
+
         result_coord.append(result)
-    
-    return result_coord #list w 2 #s: 1st is x-coord, 2nd is y-coord
+    return result_coord
+
+def get_utm_transformer(input_coord):
+    lat = float(input_coord[0])
+    lon = float(input_coord[1])
+    zone = int((lon + 180) / 6) + 1
+     
+    if lat >= 0:
+        epsg = 32600 + zone
+    else:
+        epsg = 32700 + zone
+    return Transformer.from_crs("EPSG:4326", f"EPSG:{epsg}", always_xy=True)
+
+def convert_to_utm(input_coord, transformer):
+    x, y = transformer.transform(input_coord[1], input_coord[0])
+    return (x, y)
+
+def convert_from_utm(input_coord, transformer):
+    lon, lat = transformer.transform(input_coord[0], input_coord[1], direction="INVERSE")
+    return (lat, lon)
+
+def rotate_utm(center_utm, point_utm, theta):
+    dx = point_utm[0] - center_utm[0]
+    dy = point_utm[1] - center_utm[1]
+    x_rot = dx * math.cos(theta) - dy * math.sin(theta)
+    y_rot = dx * math.sin(theta) + dy * math.cos(theta)
+    return (x_rot + center_utm[0], y_rot + center_utm[1])
+
+def align_to_axes(center_utm, point_utm, theta):
+    return rotate_utm(center_utm, point_utm, -theta)
+
+def rotate_back_to_field(center_utm, point_utm, theta):
+    return rotate_utm(center_utm, point_utm, +theta)
+
+def calc_center_transformer(tl_corner, tr_corner, bl_corner, br_corner):
+    center_x = (tl_corner[0] + tr_corner[0] + bl_corner[0] + br_corner[0]) / 4
+    center_y = (tl_corner[1] + tr_corner[1] + bl_corner[1] + br_corner[1]) / 4
+    return center_x, center_y
+
+#(separating funcs from main code)
+'''
+field_tl = """42°24'40.09"N 83°29'53.86"W"""
+field_tr = """42°24'40.24"N 83°29'51.74"W"""
+field_br = """42°24'36.70"N 83°29'51.28"W"""
+field_bl = """42°24'36.55"N 83°29'53.41"W"""''' #northville high school field coordinates
+
+field_tl = """40°46'23.2"N 74°01'10.5"W"""
+field_tr = """40°46'23.2"N 74°01'10.5"W"""
+field_br = """40°46'23.2"N 74°01'10.5"W"""
+field_bl = """40°46'23.2"N 74°01'10.5"W"""
+
+tl = convert_to_dec_degrees(field_tl)
+tr = convert_to_dec_degrees(field_tr)
+br = convert_to_dec_degrees(field_br)
+bl = convert_to_dec_degrees(field_bl)
+
+transformer = get_utm_transformer(tl)
+tl_utm = convert_to_utm(tl, transformer)
+tr_utm = convert_to_utm(tr, transformer)
+br_utm = convert_to_utm(br, transformer)
+bl_utm = convert_to_utm(bl, transformer)
+
+center_utm = calc_center_transformer(tl_utm, tr_utm, bl_utm, br_utm)
+theta = math.atan2(tr_utm[1] - tl_utm[1], tr_utm[0] - tl_utm[0])
+print("Field tilt: ", math.degrees(theta))
 
 
+tl_a = align_to_axes(center_utm, tl_utm, theta)
+tr_a = align_to_axes(center_utm, tr_utm, theta)
+bl_a = align_to_axes(center_utm, bl_utm, theta)
+br_a = align_to_axes(center_utm, br_utm, theta)
 
-#aligns a gps coord to the x & y axis according to a pivot point & given the angle to rotate 
-def align_coordinates(pivot_pt, gps_coord, theta): 
-    #subtract the pivot point from the gps coord to treat the pivot as the origin 
-    x_shift = (gps_coord[0] - pivot_pt[0])
-    y_shift = gps_coord[1] - pivot_pt[1]
+width_m  = ((tr_a[0] - tl_a[0]) + (br_a[0] - bl_a[0])) / 2
+height_m = ((tl_a[1] - bl_a[1]) + (tr_a[1] - br_a[1])) / 2
+print("Field width:  ", width_m)
+print("Field height: ", height_m)
 
-    #rotate according to theta to align w x and y coords of pivot point
-    x_final = ((x_shift*math.cos(theta) - y_shift*math.sin(theta)))
-    y_final = (x_shift*math.sin(theta) + y_shift*math.cos(theta))
+center_latlon = convert_from_utm(center_utm, transformer)
+center_lat = center_latlon[0]
+center_lon = center_latlon[1]
 
-    #translate back to actual coordinates
-    x_final += pivot_pt[0]
-    y_final += pivot_pt[1]
+meters_per_deg_lat = 111132.0
+meters_per_deg_lon = 111132.0 * math.cos(math.radians(center_lat))
 
-    return (x_final, y_final)
+half_lat = (height_m / 2) / meters_per_deg_lat
+half_lon = (width_m  / 2) / meters_per_deg_lon
 
-def rotate_back(pivot_pt, gps_coord, theta): 
-    #subtract the pivot point from the gps coord to treat the pivot as the origin 
-    x_shift = gps_coord[0] - pivot_pt[0]
-    y_shift = gps_coord[1] - pivot_pt[1]
+tl_final = (center_lat + half_lat, center_lon - half_lon)
+tr_final = (center_lat + half_lat, center_lon + half_lon)
+bl_final = (center_lat - half_lat, center_lon - half_lon)
+br_final = (center_lat - half_lat, center_lon + half_lon)
 
-    #rotate according to theta
-    x_final = (x_shift*math.cos(-theta) - y_shift*math.sin(-theta))
-    y_final = (x_shift*math.sin(-theta) + y_shift*math.cos(-theta))
+print(tl_final)
+print(tr_final)
+print(bl_final)
+print(br_final)
 
-    #translate back to actual coordinates
-    x_final += pivot_pt[0]
-    y_final += pivot_pt[1]
 
-    return (x_final, y_final)
+'''
+tr_rotated = align_coordinates(tl, tr, theta)
+bl_rotated = align_coordinates(tl, bl, theta)
+br_rotated = align_coordinates(tl, br, theta)
 
-#coordinates are in form D°M'S"(N/S/W/E) D°M'S"(N/S/W/E)
-field_tl = """42°24'40.07"N 83°29'53.85"W"""
-field_tr = """42°24'40.20"N 83°29'51.73"W"""
-field_br = """42°24'36.68"N 83°29'51.26"W"""
-field_bl = """42°24'36.52"N 83°29'53.40"W"""
+tl = convert_from_utm(tl, transformer)
+tr = convert_from_utm(tr, transformer)
+bl = convert_from_utm(bl, transformer)
+br = convert_from_utm(br, transformer)
 
-field_mid = (42.4106462, -83.4982341)
+print(tr_rotated)
+print(bl_rotated)
+print(br_rotated) '''
 
-print(convert_to_dec_degrees(field_tl))
 
 #field_width = 49.15 #m
 #field_height = 109.82 #m
