@@ -83,30 +83,50 @@ field_br = """42°24'36.70"N 83°29'51.28"W"""
 field_bl = """42°24'36.55"N 83°29'53.41"W"""''' #northville high school field coordinates
 
 field_tl = """40°46'23.2"N 74°01'10.5"W"""
-field_tr = """40°46'23.2"N 74°01'10.5"W"""
-field_br = """40°46'23.2"N 74°01'10.5"W"""
-field_bl = """40°46'23.2"N 74°01'10.5"W"""
+field_tr = """40°46'22.63"N 74°01'10.05"W"""
+field_br = """40°46'21.85"N 74°01'11.71"W"""
+field_bl = """40°46'22.36"N 74°01'12.11"W"""
+field_rand = """40°46'22.75"N 74°01'11.27"W"""
 
 tl = convert_to_dec_degrees(field_tl)
 tr = convert_to_dec_degrees(field_tr)
 br = convert_to_dec_degrees(field_br)
 bl = convert_to_dec_degrees(field_bl)
+field_rand_1 = convert_to_dec_degrees(field_rand)
 
 transformer = get_utm_transformer(tl)
 tl_utm = convert_to_utm(tl, transformer)
 tr_utm = convert_to_utm(tr, transformer)
 br_utm = convert_to_utm(br, transformer)
 bl_utm = convert_to_utm(bl, transformer)
+field_rand_utm = convert_to_utm(field_rand_1, transformer)
 
 center_utm = calc_center_transformer(tl_utm, tr_utm, bl_utm, br_utm)
 theta = math.atan2(tr_utm[1] - tl_utm[1], tr_utm[0] - tl_utm[0])
 print("Field tilt: ", math.degrees(theta))
 
 
+
 tl_a = align_to_axes(center_utm, tl_utm, theta)
 tr_a = align_to_axes(center_utm, tr_utm, theta)
 bl_a = align_to_axes(center_utm, bl_utm, theta)
 br_a = align_to_axes(center_utm, br_utm, theta)
+field_rand_a = align_to_axes(field_rand_utm, br_utm, theta)
+
+print(tl_a)
+print(tr_a)
+print(bl_a)
+print(br_a)
+
+tl_post = convert_from_utm(tl_a, transformer)
+tr_post = convert_from_utm(tr_a, transformer)
+bl_post = convert_from_utm(bl_a, transformer)
+br_post = convert_from_utm(br_a, transformer)
+
+print(tl_post)
+print(tr_post)
+print(bl_post)
+print(br_post)
 
 width_m  = ((tr_a[0] - tl_a[0]) + (br_a[0] - bl_a[0])) / 2
 height_m = ((tl_a[1] - bl_a[1]) + (tr_a[1] - br_a[1])) / 2
@@ -127,11 +147,14 @@ tl_final = (center_lat + half_lat, center_lon - half_lon)
 tr_final = (center_lat + half_lat, center_lon + half_lon)
 bl_final = (center_lat - half_lat, center_lon - half_lon)
 br_final = (center_lat - half_lat, center_lon + half_lon)
+field_rand_final = convert_from_utm(field_rand_a, transformer)
+
 
 print(tl_final)
 print(tr_final)
 print(bl_final)
 print(br_final)
+print(field_rand_final)
 
 
 '''
