@@ -1,5 +1,5 @@
 import math
-from pyproj import Transformer
+from pyproj import Transformer #run pip install pyproj
 
 def convert_to_dec_degrees(coord1):
     coord1str = coord1
@@ -57,104 +57,124 @@ def convert_from_utm(input_coord, transformer):
     lon, lat = transformer.transform(input_coord[0], input_coord[1], direction="INVERSE")
     return (lat, lon)
 
-def rotate_utm(center_utm, point_utm, theta):
-    dx = point_utm[0] - center_utm[0]
-    dy = point_utm[1] - center_utm[1]
+def rotate_point(pivot_utm, point_utm, theta):
+    dx = point_utm[0] - pivot_utm[0]
+    dy = point_utm[1] - pivot_utm[1]
     x_rot = dx * math.cos(theta) - dy * math.sin(theta)
     y_rot = dx * math.sin(theta) + dy * math.cos(theta)
-    return (x_rot + center_utm[0], y_rot + center_utm[1])
+    return (x_rot + pivot_utm[0], y_rot + pivot_utm[1])
 
-def align_to_axes(center_utm, point_utm, theta):
-    return rotate_utm(center_utm, point_utm, -theta)
+def unrotate_point(pivot_utm, rotated_point_utm, theta):
+    return rotate_point(pivot_utm, rotated_point_utm, -theta)
 
-def rotate_back_to_field(center_utm, point_utm, theta):
-    return rotate_utm(center_utm, point_utm, +theta)
+def calc_theta(tl_utm, tr_utm): #meant to be used w top left & top right
+    return math.atan2(tr_utm[1] - tl_utm[1], tr_utm[0] - tl_utm[0])
 
-def calc_center_transformer(tl_corner, tr_corner, bl_corner, br_corner):
-    center_x = (tl_corner[0] + tr_corner[0] + bl_corner[0] + br_corner[0]) / 4
-    center_y = (tl_corner[1] + tr_corner[1] + bl_corner[1] + br_corner[1]) / 4
-    return center_x, center_y
+def create_axis_aligned_rectangle(tl_utm, tr_utm, bl_utm, br_utm, theta):
+    
+    #calc avg width and height from orig corners
+    width_m = (math.hypot(tr_utm[0] - tl_utm[0], tr_utm[1] - tl_utm[1]) + 
+               math.hypot(br_utm[0] - bl_utm[0], br_utm[1] - bl_utm[1])) / 2
+    height_m = (math.hypot(bl_utm[0] - tl_utm[0], bl_utm[1] - tl_utm[1]) + 
+                math.hypot(br_utm[0] - tr_utm[0], br_utm[1] - tr_utm[1])) / 2
+    
+    # Create perfect axis-aligned rectangle
+    # TL stays at original position
+    # TR is directly east (+x direction)
+    # BL is directly south (-y direction)
+    tl_rect = tl_utm
+    tr_rect = (tl_utm[0] + width_m, tl_utm[1])
+    bl_rect = (tl_utm[0], tl_utm[1] - height_m)
+    br_rect = (tl_utm[0] + width_m, tl_utm[1] - height_m)
+    
+    return tl_rect, tr_rect, bl_rect, br_rect, theta, width_m, height_m
+
+def rotate_rectangle(tl_utm, tr_utm, bl_utm, br_utm, pivot_utm, theta):
+    tl_rot = rotate_point(pivot_utm, tl_utm, theta)
+    tr_rot = rotate_point(pivot_utm, tr_utm, theta)
+    bl_rot = rotate_point(pivot_utm, bl_utm, theta)
+    br_rot = rotate_point(pivot_utm, br_utm, theta)
+    return tl_rot, tr_rot, bl_rot, br_rot
+
+def align_corners_to_latlon(tl_latlon, tr_latlon, bl_latlon):
+    #tl is same
+    tl_aligned = tl_latlon
+    
+    #tr is tl's latitude, keeps its own longitude
+    tr_aligned = (tl_latlon[0], tr_latlon[1])
+    
+    #bl is tl's longitude, keeps its own latitude
+    bl_aligned = (bl_latlon[0], tl_latlon[1])
+    
+    #br is bl's latitude and tr's longitude
+    br_aligned = (bl_latlon[0], tr_latlon[1])
+    
+    return tl_aligned, tr_aligned, br_aligned, bl_aligned
 
 #(separating funcs from main code)
-'''
+
 field_tl = """42°24'40.09"N 83°29'53.86"W"""
 field_tr = """42°24'40.24"N 83°29'51.74"W"""
 field_br = """42°24'36.70"N 83°29'51.28"W"""
-field_bl = """42°24'36.55"N 83°29'53.41"W"""''' #northville high school field coordinates
+field_bl = """42°24'36.55"N 83°29'53.41"W""" #northville high school field coordinates
 
-field_tl = """40°46'23.2"N 74°01'10.5"W"""
+'''field_tl = """40°46'23.2"N 74°01'10.5"W"""
 field_tr = """40°46'22.63"N 74°01'10.05"W"""
 field_br = """40°46'21.85"N 74°01'11.71"W"""
-field_bl = """40°46'22.36"N 74°01'12.11"W"""
-field_rand = """40°46'22.75"N 74°01'11.27"W"""
+field_bl = """40°46'22.36"N 74°01'12.11"W"""'''
 
 tl = convert_to_dec_degrees(field_tl)
 tr = convert_to_dec_degrees(field_tr)
 br = convert_to_dec_degrees(field_br)
 bl = convert_to_dec_degrees(field_bl)
-field_rand_1 = convert_to_dec_degrees(field_rand)
 
 transformer = get_utm_transformer(tl)
 tl_utm = convert_to_utm(tl, transformer)
 tr_utm = convert_to_utm(tr, transformer)
 br_utm = convert_to_utm(br, transformer)
 bl_utm = convert_to_utm(bl, transformer)
-field_rand_utm = convert_to_utm(field_rand_1, transformer)
 
-center_utm = calc_center_transformer(tl_utm, tr_utm, bl_utm, br_utm)
-theta = math.atan2(tr_utm[1] - tl_utm[1], tr_utm[0] - tl_utm[0])
-print("Field tilt: ", math.degrees(theta))
+#calc theta from tl-tr side
+theta = calc_theta(tl_utm, tr_utm)
+print("Field tilt (theta):", math.degrees(theta), " in degrees")
 
+#create axis-aligned rectangle with same dimensions as original
+tl_rect, tr_rect, bl_rect, br_rect, field_theta, width_m, height_m = create_axis_aligned_rectangle(tl_utm, tr_utm, bl_utm, br_utm, theta)
 
-
-tl_a = align_to_axes(center_utm, tl_utm, theta)
-tr_a = align_to_axes(center_utm, tr_utm, theta)
-bl_a = align_to_axes(center_utm, bl_utm, theta)
-br_a = align_to_axes(center_utm, br_utm, theta)
-field_rand_a = align_to_axes(field_rand_utm, br_utm, theta)
-
-print(tl_a)
-print(tr_a)
-print(bl_a)
-print(br_a)
-
-tl_post = convert_from_utm(tl_a, transformer)
-tr_post = convert_from_utm(tr_a, transformer)
-bl_post = convert_from_utm(bl_a, transformer)
-br_post = convert_from_utm(br_a, transformer)
-
-print(tl_post)
-print(tr_post)
-print(bl_post)
-print(br_post)
-
-width_m  = ((tr_a[0] - tl_a[0]) + (br_a[0] - bl_a[0])) / 2
-height_m = ((tl_a[1] - bl_a[1]) + (tr_a[1] - br_a[1])) / 2
 print("Field width:  ", width_m)
 print("Field height: ", height_m)
 
-center_latlon = convert_from_utm(center_utm, transformer)
-center_lat = center_latlon[0]
-center_lon = center_latlon[1]
+print("\nAxis-aligned rectangle")
+tl_latlon = convert_from_utm(tl_rect, transformer)
+tr_latlon = convert_from_utm(tr_rect, transformer)
+bl_latlon = convert_from_utm(bl_rect, transformer)
+br_latlon = convert_from_utm(br_rect, transformer)
+print(tl_latlon)
+print(tr_latlon)
+print(br_latlon)
+print(bl_latlon)
 
-meters_per_deg_lat = 111132.0
-meters_per_deg_lon = 111132.0 * math.cos(math.radians(center_lat))
+tl_perf, tr_perf, br_perf, bl_perf = align_corners_to_latlon(tl_latlon, tr_latlon, bl_latlon)
+print("Latitude/Longitude aligned corners: ")
+print(tl_perf)
+print(tr_perf)
+print(br_perf)
+print(bl_perf)
 
-half_lat = (height_m / 2) / meters_per_deg_lat
-half_lon = (width_m  / 2) / meters_per_deg_lon
-
-tl_final = (center_lat + half_lat, center_lon - half_lon)
-tr_final = (center_lat + half_lat, center_lon + half_lon)
-bl_final = (center_lat - half_lat, center_lon - half_lon)
-br_final = (center_lat - half_lat, center_lon + half_lon)
-field_rand_final = convert_from_utm(field_rand_a, transformer)
-
-
-print(tl_final)
-print(tr_final)
-print(bl_final)
-print(br_final)
-print(field_rand_final)
+#test pt
+field_rand = """42°24'38.61"N 83°29'51.52"W"""
+field_rand_1 = convert_to_dec_degrees(field_rand)
+field_rand_utm = convert_to_utm(field_rand_1, transformer)
+#rotate
+field_rand_rotated = rotate_point(tl_utm, field_rand_utm, theta)
+field_rand_rotated_latlon = convert_from_utm(field_rand_rotated, transformer)
+#unrotate
+field_rand_back = unrotate_point(tl_utm, field_rand_rotated, theta)
+field_rand_back_latlon = convert_from_utm(field_rand_back, transformer)
+print("\nOriginal:    ", field_rand_1)
+print("Rotated: ", field_rand_rotated_latlon)
+print("Unrotated: ", field_rand_back_latlon)
+print("Match: ", ((field_rand_utm[0] == field_rand_back[0]) and (field_rand_utm[1] == field_rand_back[1])))
 
 
 '''
@@ -244,28 +264,3 @@ print(field_bl == orig_bl)
 # Rz.append([0, 0, 1])
 # R = Rz*Ry*Rx
 # r_world = R*r
-
-
-# #Step 3- intersect ray with ground
-# H = 0 #camera height (TODO: replace)
-# Xc = 0 #X-coord of camera irl (TODO: replace)
-# Yc = 0 #Y-coord of camera irl (TODO: replace)
-# X = Xc + (H/r_world[2])*r[0] #X-coord of mine irl
-# Y = Yc + (H/r_world[2])*r[1] #Y-coord of mine irl
-
-
-# #Step 4- convert meters to latitude & longitude
-# lat_cam = 0 #latitude of camera (TODO: replace)
-# long_cam = 0 #longitude of camera (TODO: replace)
-# lat = lat_cam + Y/111320
-# long = long_cam + X/(111320*np.cos(roll))
-
-
-
-'''
-TODO: 
-need camera GPS position, camera altitude, camera orientation (roll, pitch, yaw), camera focal length & scaling factor
-put code into funcs & int main, send output to a txt file
-'''
-
-field_tl_1 = """42°24'40.07"N 83°29'53.85"W"""
