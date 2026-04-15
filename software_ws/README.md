@@ -133,3 +133,8 @@ To get ROS working on the rPi, we either need to set up a Docker image or flash 
   - we prefer flashing Ubuntu
 Once ROS (and all other necessary packages) are set up, we can first test flying by running mfly_test in software_ws
 path of mfly_test: software_ws/src/px4_ros_com/src/examples/offboard/mfly_test.cpp
+
+-----------------------------------------------------
+Running the MicroXRCE agent on the rpi docker image:
+
+sudo MicroXRCEAgent serial --dev /dev/ttyAMA10 -b 921600
