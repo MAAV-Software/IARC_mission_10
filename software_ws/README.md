@@ -137,4 +137,4 @@ path of mfly_test: software_ws/src/px4_ros_com/src/examples/offboard/mfly_test.c
 -----------------------------------------------------
 Running the MicroXRCE agent on the rpi docker image:
 
-sudo MicroXRCEAgent serial --dev /dev/ttyAMA10 -b 921600
+sudo MicroXRCEAgent serial --dev /dev/ttyAMA0 -b 921600
