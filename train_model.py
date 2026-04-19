@@ -12,11 +12,11 @@ def check_cuda():
 if __name__ == '__main__':
     device_id = check_cuda()
 
-    model = YOLO('/Users/dervint/MAAV/pfm1-mines/weights/12-2-25.pt') 
+    model = YOLO('./weights/12-2-25.pt')
 
     print("Starting Detection Training...")
     results = model.train(
-        data="/Users/dervint/MAAV/pfm1-mines/dataset/data.yaml", 
+        data="./dataset/data.yaml",
         device=device_id,
         epochs=30,        
         patience=50,       
@@ -31,7 +31,7 @@ if __name__ == '__main__':
         fliplr=0.5,        
         mosaic=1.0,        
         
-        project="/Users/dervint/MAAV/pfm1-mines/training_output",
+        project="./training_output",
         name='green_mine_detect_v1',
         exist_ok=True      
     )

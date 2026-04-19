@@ -26,7 +26,7 @@ model = YOLOWorld(model_path)
 end_time = time.time()
 print(f"Elapsed Time: {end_time - init_time}")
 
-image_path = "/Users/dervint/MAAV/IARC_25-26/taken_images/dervint_2_0.png" # Output from the camera script
+image_path = "./test_images/IMG_5893pfm1-mine.jpeg" # Output from the camera script
 
 # Read in the image and open it
 image = cv2.imread(image_path)
@@ -37,7 +37,7 @@ print(img_width, img_height)
 
 # Predict using the YOLO model and show the result
 results = model.predict(image,conf=0.3)
-# results[0].show()
+results[0].show()
 
 # Get the bounding boxes
 bounding_boxes = results[0].boxes  # Bounding boxes for the YOLO Predictions Image
