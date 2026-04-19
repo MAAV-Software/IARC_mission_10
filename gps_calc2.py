@@ -1,12 +1,19 @@
 import math
+import sys
 from pyproj import Transformer, CRS
+
+# Usage cmd: python3 gps_calc2.py 42.410812 -83.497912
+
+constants_path = "./constants/bounding_boxes.txt"
+output_path = "results.txt"
 
 def get_spcs_transformer():
     to_spcs = Transformer.from_crs("EPSG:4326", "EPSG:6498", always_xy=True)
     from_spcs = Transformer.from_crs("EPSG:6498", "EPSG:4326", always_xy=True)
-    return to_spcs, from_spcs
+
     #to_spcs = Transformer.from_crs("EPSG:4326", "EPSG:6418", always_xy=True) 
     #from_spcs = Transformer.from_crs("EPSG:6418", "EPSG:4326", always_xy=True)     if we were in Huntsville, AL
+    return to_spcs, from_spcs
 
 def convert_to_spcs(latlon, transformer):
     x, y = transformer.transform(latlon[1], latlon[0])
@@ -84,17 +91,52 @@ def calc_dimensions(tl, tr, bl, br):
 #func/main code separator
 ############################################################################################
 
-#northville high school field coordinates
-field_tl = """42°24'40.09"N 83°29'53.86"W"""
-field_tr = """42°24'40.24"N 83°29'51.74"W"""
-field_br = """42°24'36.70"N 83°29'51.28"W"""
-field_bl = """42°24'36.55"N 83°29'53.41"W"""
+# #northville high school field coordinates
+# field_tl = """42°24'40.09"N 83°29'53.86"W"""
+# field_tr = """42°24'40.24"N 83°29'51.74"W"""
+# field_br = """42°24'36.70"N 83°29'51.28"W"""
+# field_bl = """42°24'36.55"N 83°29'53.41"W"""
 
-tl = convert_to_dec_degrees(field_tl)
-tr = convert_to_dec_degrees(field_tr)
-br = convert_to_dec_degrees(field_br)
-bl = convert_to_dec_degrees(field_bl)
+# tl = convert_to_dec_degrees(field_tl)
+# tr = convert_to_dec_degrees(field_tr)
+# br = convert_to_dec_degrees(field_br)
+# bl = convert_to_dec_degrees(field_bl)
 
+rand_lat = sys.argv[1]
+rand_lon = sys.argv[2]
+
+rand_latlon = []
+rand_latlon.append(rand_lat)
+rand_latlon.append(rand_lon)
+
+tl = []
+tr = []
+br = []
+bl = []
+
+with open(constants_path, "r") as f:
+    for i, line in enumerate(f):
+        if i == 0:
+            line_contents = line.strip().split()
+            tl.append(float(line_contents[0]))
+            tl.append(float(line_contents[1]))
+        elif i == 1:
+            line_contents = line.strip().split()
+            tr.append(float(line_contents[0]))
+            tr.append(float(line_contents[1]))
+        elif i == 2:
+            line_contents = line.strip().split()
+            br.append(float(line_contents[0]))
+            br.append(float(line_contents[1]))
+        elif i == 3:
+            line_contents = line.strip().split()
+            bl.append(float(line_contents[0]))
+            bl.append(float(line_contents[1]))
+        else:
+            print("Read in the first 4 elements")
+            break
+
+# print(tl, tr, br, bl)
 #calc SPCS transformers
 to_spcs, from_spcs = get_spcs_transformer()
 
@@ -106,12 +148,12 @@ bl_spcs = convert_to_spcs(bl, to_spcs)
 
 #calcu theta w top left and top right corners
 theta = calc_theta(tl_spcs, tr_spcs)
-print("theta: ", math.degrees(theta), " degrees")
+# print("theta: ", math.degrees(theta), " degrees")
 
 #calc dimensions
 width, height = calc_dimensions(tl_spcs, tr_spcs, bl_spcs, br_spcs)
-print("field width: ", width, " meters")
-print("field height: ", height, " meters")
+# print("field width: ", width, " meters")
+# print("field height: ", height, " meters")
 
 tl_rect, tr_rect, bl_rect, br_rect = rotate_rectangle(tl_spcs, tr_spcs, bl_spcs, br_spcs, theta)
 
@@ -120,27 +162,30 @@ tl_final = convert_from_spcs(tl_rect, from_spcs)
 tr_final = convert_from_spcs(tr_rect, from_spcs)
 br_final = convert_from_spcs(br_rect, from_spcs)
 bl_final = convert_from_spcs(bl_rect, from_spcs)
-print("final coordinates: ")
-print(tl_final)
-print(tr_final)
-print(br_final)
-print(bl_final)
+# print("final coordinates: ")
+# print(tl_final)
+# print(tr_final)
+# print(br_final)
+# print(bl_final)
 
 
 
-#test w random point
-field_rand = """42°24'38.61"N 83°29'51.52"W"""
-rand_latlon = convert_to_dec_degrees(field_rand)
+# #test w random point
+# field_rand = """42°24'38.61"N 83°29'51.52"W"""
+# rand_latlon = convert_to_dec_degrees(field_rand)
+
 rand_spcs = convert_to_spcs(rand_latlon, to_spcs)
 
-print("orig point: ", rand_latlon)
+# print("orig point: ", rand_latlon)
 
 #rotate by theta
 rand_rotated = rotate_point(tl_spcs, rand_spcs, theta)
 rand_rotated_latlon = convert_from_spcs(rand_rotated, from_spcs)
+with open(output_path, "a") as f:
+    f.write(f"{rand_rotated_latlon[0]} {rand_rotated_latlon[1]}\n")
 print("rotated by theta: ", rand_rotated_latlon)
 
 #unrotate back
 rand_back = unrotate_point(tl_spcs, rand_rotated, theta)
 rand_back_latlon = convert_from_spcs(rand_back, from_spcs)
-print("unrotated back: ", rand_back_latlon)
+# print("unrotated back: ", rand_back_latlon)
