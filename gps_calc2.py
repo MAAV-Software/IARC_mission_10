@@ -183,7 +183,7 @@ rand_rotated = rotate_point(tl_spcs, rand_spcs, theta)
 rand_rotated_latlon = convert_from_spcs(rand_rotated, from_spcs)
 with open(output_path, "a") as f:
     f.write(f"{rand_rotated_latlon[0]} {rand_rotated_latlon[1]}\n")
-print("rotated by theta: ", rand_rotated_latlon)
+# print("rotated by theta: ", rand_rotated_latlon)
 
 #unrotate back
 rand_back = unrotate_point(tl_spcs, rand_rotated, theta)
