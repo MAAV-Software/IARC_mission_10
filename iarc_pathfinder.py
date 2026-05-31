@@ -26,6 +26,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+instructions_output = "iarc_steps.txt"
 
 # ====================================================================
 # Grid constants
@@ -446,7 +447,9 @@ def main():
         print(f"  Compute time: {dt:.2f}s")
 
         commands = grid_path_to_commands(path, G)
-        print(f"\nPath commands (paste into https://fexl.com/iarc/draw/):\n{commands}")
+        # print(f"\nPath commands (paste into https://fexl.com/iarc/draw/):\n{commands}")
+        with open(instructions_output, "w") as f:
+            f.write(f"{commands}")
 
         if not args.no_plot:
             visualize(mines, path, G, result, f"seed={args.seed} | {args.mines} mines")

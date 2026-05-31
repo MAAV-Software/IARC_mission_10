@@ -7,6 +7,8 @@ import numpy as np
 import math
 
 input_path = "results.txt"
+camera_specs = "constants/camera_specs.txt"
+altitde_specs = "constants/altitude.txt"
 
 # camera 
 # h: 46.5 in
@@ -57,8 +59,21 @@ def main():
     # BL:  (42.29309574987266, -83.711819)
 
     # TODO Change these to take into account the height later on
-    img_height_inch = 46.5
-    img_width_inch = 36.25
+    horizontal_fov = 0
+    vertical_fov = 0
+    with open(camera_specs, "r") as f:
+        for line in f:
+            line_contents = line.strip().split()
+            horizontal_fov = float(line_contents[0])
+            vertical_fov = float(line_contents[1])
+            break
+    
+    altitude = 0
+    with open(altitde_specs, "r") as f:
+        for line in f:
+            line_contents = line.strip().split()
+            altitude = float(line_contents[0])
+            break
 
     mine_locations = []
 
@@ -77,9 +92,15 @@ def main():
             mine_y_min = float(line_contents[5])
             mine_y_max = float(line_contents[6])
 
+            # Get the dimension of the camera frame
+            hor_rad = math.radians(horizontal_fov)
+            img_width_m = 2 * (absolute_height - altitude) * math.tan(hor_rad) 
             
-            img_height_cm = (img_height_inch * 2.54) / 100 #convert to inches
-            img_width_cm = (img_width_inch * 2.54) / 100
+            vert_rad = math.radians(vertical_fov)
+            img_height_m = 2 * (absolute_height - altitude) * math.tan(vert_rad)
+
+            img_height_cm = (img_height_m) / 100 #convert to cm
+            img_width_cm = (img_width_m) / 100
             
             # mine_x_min, mine_y_min, mine_x_max, mine_y_max = (0.11155333116319445, 0.15966543579101564, 0.19914363606770832, 0.22527638753255208)
             mine_x , mine_y = (mine_x_min + mine_x_max ) / 2, (mine_y_min + mine_y_max ) / 2
