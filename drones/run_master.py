@@ -1,8 +1,5 @@
 """Example TCP socket server."""
 import socket
-import json
-import threading
-import sys
 import subprocess
 from roles.manager import ManagerDrone
 

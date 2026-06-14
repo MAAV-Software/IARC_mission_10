@@ -1,9 +1,5 @@
 """Example TCP socket client."""
-import os
-import cv2
-import pathlib
 import socket
-from ultralytics import YOLOWorld
 from roles.explorer import ExploreDrone
 
 input_path = "DervinSmellsLikePoop.csv"
