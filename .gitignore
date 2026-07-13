@@ -1,1 +1,8 @@
-!gitkeep
+test_model.py
+train_model.py
+blender/
+computer_vision/
+drones/roles/__pycache__
+scout_noah1_quinn_brady.py
+.DS_Store
+

@@ -25,6 +25,7 @@ import argparse
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from pathlib import Path
 
 instructions_output = "iarc_steps.txt"
 
@@ -452,7 +453,8 @@ def main():
             f.write(f"{commands}")
 
         if not args.no_plot:
-            visualize(mines, path, G, result, f"seed={args.seed} | {args.mines} mines")
+            maav_IARCM10_compweb_dir = Path(__file__).parent.parent
+            visualize(mines, path, G, result, f"seed={args.seed} | {args.mines} mines", save_path=f"{maav_IARCM10_compweb_dir}/compweb/iarc_result.png")
     else:
         print("  No path found!")
 
