@@ -2,10 +2,12 @@
 import socket
 import json
 import threading
-import pathlib
+from pathlib import Path
+import time
+import subprocess
 
-bounds_path = "./constants/bounding_boxes.txt"
-aggregate_path = "all_results.csv"
+bounds_path = Path(__file__).parent.parent.parent / "constants/bounding_boxes.txt"
+aggregate_path = Path(__file__).parent.parent / "all_results.csv"
 
 class ManagerDrone:
     "Construct an instance of the main drone"
@@ -17,9 +19,13 @@ class ManagerDrone:
         self.port = port
         self.coords = []
         self.exp_drones = {}
+        self.drone_last_seen = {}
         self.finished_drones = 0
+        self.self_finished = False
         self.bounds = []
         self.shutdown_flag = False
+        self.mission_status = "pre-mission"
+        self.next_action = "scout"
 
         with open(bounds_path, "r") as f:
             for line in f:
@@ -82,6 +88,33 @@ class ManagerDrone:
                 print(message_dict)
                 self.handle_message(message_dict)
     
+    def udp_server(self):
+        """Test UDP Socket Server."""
+        # Create an INET, DGRAM socket, this is UDP
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+
+            # Bind the UDP socket to the server
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.bind((self.host, self.port))
+            sock.settimeout(1)
+
+            # Receive incoming UDP messages
+            while not self.shutdown_flag:
+                try:
+                    message_bytes = sock.recv(4096)
+                except socket.timeout:
+                    continue
+                message_str = message_bytes.decode("utf-8")
+                message_dict = json.loads(message_str)
+                # print(message_dict)
+                self.handle_message(message_dict)
+
+                time_now = time.monotonic()
+                # No sock.listen() since UDP doesn't establish connections like TCP
+                for drone_id, last_seen in self.drone_last_seen.items():
+                    if time_now - last_seen >= 5:
+                        self.exp_drones[drone_id] = "idle"
+    
     def handle_message(self, message_dict):
         if message_dict["message_type"] == "coordinates":
             self.handle_coordinates(message_dict)
@@ -89,9 +122,50 @@ class ManagerDrone:
             self.handle_registration(message_dict)
         elif message_dict["message_type"] == "finished":
             self.handle_finished(message_dict)
+        elif message_dict["message_type"] == "heartbeat":
+            self.handle_heartbeat(message_dict)
+        elif message_dict["message_type"] == "run_drones":
+            self.handle_run_drones()
         else:
             print("Message Unknown")
         
+    def handle_heartbeat(self, message_dict):
+        worker_host = message_dict["drone_host"]
+        worker_port = message_dict["drone_port"]
+
+        drone_key = str(worker_host) + "_" + str(worker_port)
+        self.exp_drones[drone_key] = {
+            "drone_host": worker_host,
+            "drone_port": worker_port,
+            "status": "working"
+        }
+        self.drone_last_seen[drone_key] = time.monotonic()
+    
+    def handle_run_drones(self):
+        self.mission_status = "in_mission"
+
+        for drone_id, drone_status in self.exp_drones.items():
+            if drone_status["status"] == "working":
+                worker_host, worker_port = drone_id.strip().split("_")
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                    print(f"The worker host is {worker_host} and the port is {worker_port}")
+                    sock.connect((worker_host, int(worker_port))) 
+                    message = json.dumps({
+                        "message_type": "run_drones"
+                    })
+                    sock.sendall(message.encode('utf-8'))
+
+        # subprocess.run("ros2", ...) # Run that command to publish to the start_mission topic
+        time.sleep(5)
+
+        # Now that the ros has finished running...
+        # drones_directory = Path(__file__).parent.parent
+        # skib_path = drones_directory / "skib.py"
+        # bidi_path = drones_directory / "bidi.py"
+        # subprocess.run(["python3", f"{str(skib_path)}"])
+        # subprocess.run(["python3", f"{str(bidi_path)}"])
+        
+
     # adds one pair of coords
     def handle_coordinates(self, message_dict):
         worker_host = message_dict["host"]
@@ -107,12 +181,14 @@ class ManagerDrone:
     def handle_registration(self, message_dict):
         drone_host = message_dict["drone_host"]
         drone_port = message_dict["drone_port"]
-        drone_key = str(drone_host) + str(drone_port)
+        drone_key = str(drone_host) + "_" + str(drone_port)
         self.exp_drones[drone_key] = {
             "drone_host": drone_host,
             "drone_port": drone_port,
-            "status": "working"
+            "status": "idle"
         }
+        self.drone_last_seen[drone_key] = time.monotonic()
+
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((drone_host, drone_port)) 
             message = json.dumps({
@@ -123,10 +199,11 @@ class ManagerDrone:
     def handle_finished(self, message_dict):
         drone_host = message_dict["drone_host"]
         drone_port = message_dict["drone_port"]
-        drone_key = str(drone_host) + str(drone_port)
+        drone_key = str(drone_host) + "_" + str(drone_port)
         if self.exp_drones[drone_key]["status"] == "working":
             self.exp_drones[drone_key]["status"] = "finished"
             self.finished_drones += 1
+            print(self.finished_drones, len(self.exp_drones))
             if self.finished_drones == len(self.exp_drones):
                 self.shutdown_flag = True
         else:
@@ -134,9 +211,15 @@ class ManagerDrone:
             exit(1)
 
     def run_drone(self):
+        udp_thread = threading.Thread(target=self.udp_server)
+        udp_thread.start()
+
         tcp_thread = threading.Thread(target=self.tcp_server)
         tcp_thread.start()
+
         tcp_thread.join()
+        udp_thread.join()
+        
 
         with open(aggregate_path, "w") as f: # Write the coords into it
             for coord in self.coords:

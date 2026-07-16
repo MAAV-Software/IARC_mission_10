@@ -28,6 +28,7 @@ with open(output_path, "r") as f:
 
 with open(output_path, "w") as f:
     for i, bound in enumerate(mine_bounds):
+        print(bound)
         f.write(f"{converted_coords[i][0]} {converted_coords[i][1]} {mine_bounds[i][0]} {mine_bounds[i][1]} {mine_bounds[i][2]} {mine_bounds[i][3]} {mine_bounds[i][4]}\n")
 
 

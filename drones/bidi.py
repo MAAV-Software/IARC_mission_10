@@ -1,9 +1,10 @@
 import numpy as np
 import math
+from pathlib import Path
 
 input_path = "results.txt"
-camera_specs = "constants/camera_specs.txt"
-altitde_specs = "constants/altitude.txt"
+camera_specs = Path(__file__).parent.parent / "constants/camera_specs.txt"
+altitde_specs = Path(__file__).parent.parent / "constants/altitude.txt"
 
 # camera 
 # h: 46.5 in
