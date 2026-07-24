@@ -5,6 +5,9 @@ import threading
 from pathlib import Path
 import time
 import subprocess
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Bool
 
 bounds_path = Path(__file__).parent.parent.parent / "constants/bounding_boxes.txt"
 aggregate_path = Path(__file__).parent.parent / "all_results.csv"
@@ -154,9 +157,30 @@ class ManagerDrone:
                         "message_type": "run_drones"
                     })
                     sock.sendall(message.encode('utf-8'))
+	
+	# subprocess.run("ros2", ...) # Run that command to publish to the start_mission topic
+        rclpy.init()
 
-        # subprocess.run("ros2", ...) # Run that command to publish to the start_mission topic
-        time.sleep(5)
+        node = Node("start_mission_publisher")
+
+        publisher = node.create_publisher(
+            Bool,
+            "/start_mission",
+            10
+        )
+
+        msg = Bool()
+        msg.data = True
+
+        # Give the middleware a chance to send the message
+        while publisher.get_subscription_count() == 0:
+            rclpy.spin_once(node, timeout_sec=0.1)
+
+        publisher.publish(msg)
+        rclpy.spin_once(node, timeout_sec=0.1)
+
+        node.destroy_node()
+        rclpy.shutdown()
 
         # Now that the ros has finished running...
         # drones_directory = Path(__file__).parent.parent

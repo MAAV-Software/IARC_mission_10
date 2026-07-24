@@ -454,7 +454,7 @@ def main():
 
         if not args.no_plot:
             maav_IARCM10_compweb_dir = Path(__file__).parent.parent.parent
-            visualize(mines, path, G, result, f"seed={args.seed} | {args.mines} mines", save_path=f"{maav_IARCM10_compweb_dir}/compweb/maav-IARCM10-compweb/compweb/static/images/iarc_result.png")
+            visualize(mines, path, G, result, f"seed={args.seed} | {args.mines} mines", save_path=f"{maav_IARCM10_compweb_dir}/maav-IARCM10-compweb/compweb/static/images/iarc_result.png")
     else:
         print("  No path found!")
 

@@ -5,6 +5,9 @@ import json
 import time
 from pathlib import Path
 import subprocess
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
 
 class ExploreDrone:
     "Construct an instance of an explorer Drone"
@@ -110,7 +113,28 @@ class ExploreDrone:
 
     def handle_run_drones(self):
         # subprocess.run("ros2", ...) # Run that ros2 command to publish to the start topic
-        time.sleep(5)
+        # time.sleep(5)
+
+	rclpy.init()
+
+	node = Node("initial_start_mission_publisher")
+
+	publisher = node.create_publisher(
+    		Bool,
+    		"/start_mission",
+    		10
+		)
+
+	msg = Bool()
+	msg.data = True
+
+	publisher.publish(msg)
+
+	# Give ROS a moment to actually send the message
+	rclpy.spin_once(node, timeout_sec=0.1)
+
+	node.destroy_node()
+	rclpy.shutdown()
 
         # Now that the ros has finished running...
         drones_directory = Path(__file__).parent.parent
